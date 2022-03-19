@@ -1,7 +1,6 @@
+// const fs = require('fs/promises');
 // const talkerJson = require('../talker.json');
 
-// const read = async (req, res, netx) => {
-  
-// };
+// const read = ;
 
-// module.exports = read;
+// module.exports = { read };
