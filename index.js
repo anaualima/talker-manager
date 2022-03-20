@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs/promises');
 const crypto = require('crypto');
+const rescue = require('express-rescue');
 const auth = require('./Middleware/auth');
 // const talker = require('./Controller/talker');
 // const error = require('./Middleware/error');
@@ -39,11 +40,13 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(404).send({ message: 'Pessoa palestrante não encontrada' });
 });
 
-app.post('/login', auth, (req, res) => {
+app.post('/login', auth, rescue((req, res) => {
   const token = crypto.randomBytes(8).toString('hex');
   console.log(token);
-  if (token.length === 16) return res.status(200).send({ tolken: token });
-});
+  if (token !== undefined) {
+    return res.status(200).json({ token });
+  }
+}));
 
 app.listen(PORT, () => {
   console.log('Online');
