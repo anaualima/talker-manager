@@ -4,6 +4,13 @@ const fs = require('fs/promises');
 const crypto = require('crypto');
 const rescue = require('express-rescue');
 const auth = require('./Middleware/auth');
+
+const validToken = require('./Middleware/validToken');
+const validName = require('./Middleware/validName');
+const validAge = require('./Middleware/validAge');
+const validTalk = require('./Middleware/validTalk');
+const validWatchedAt = require('./Middleware/validWatchedAt');
+const validRate = require('./Middleware/validRate');
 // const talker = require('./Controller/talker');
 // const error = require('./Middleware/error');
 
@@ -14,6 +21,8 @@ app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
+
+const token = crypto.randomBytes(8).toString('hex');
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -41,12 +50,28 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 app.post('/login', auth, rescue((req, res) => {
-  const token = crypto.randomBytes(8).toString('hex');
   console.log(token);
   if (token !== undefined) {
     return res.status(200).json({ token });
   }
 }));
+
+app.post('/talker',
+  validToken,
+  validName,
+  validAge,
+  validTalk,
+  validWatchedAt,
+  validRate,
+  async (req, res) => {
+    const data = await fs.readFile(talkerJson);
+    const treatmentData = JSON.parse(data); // tranforma o data em string para o readfile poder ler.
+    const newTalker = req.body;
+    newTalker.id = treatmentData.length + 1;
+   treatmentData.push(newTalker);
+   fs.writeFile(talkerJson, JSON.stringify(treatmentData));
+   return res.status(201).send(newTalker);
+});
 
 app.listen(PORT, () => {
   console.log('Online');
