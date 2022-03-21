@@ -73,6 +73,16 @@ app.post('/talker',
    return res.status(201).send(newTalker);
 });
 
+app.delete('/talker/:id', validToken, async (req, res) => {
+  const { id } = req.body;
+  const data = await fs.readFile(talkerJson);
+  const treatmentData = JSON.parse(data);
+  const findId = treatmentData.find((f) => f.id === Number(id));
+  treatmentData.pop(findId);
+  fs.writeFile(talkerJson, JSON.stringify(treatmentData));
+  res.status(204).send(findId);
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
