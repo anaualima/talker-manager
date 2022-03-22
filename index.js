@@ -83,6 +83,14 @@ app.delete('/talker/:id', validToken, async (req, res) => {
   res.status(204).send(findId);
 });
 
+app.get('/talker/search', validToken, async (req, res) => {
+  const { name } = req.query;
+  const data = await fs.readFile(talkerJson);
+  const treatmentData = JSON.parse(data);
+  const filterSearch = treatmentData.filter((t) => t.name.includes(name));
+  return res.status(200).json(filterSearch);
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
