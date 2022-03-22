@@ -29,6 +29,14 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.get('/talker/search', validToken, async (req, res) => {
+  const { q } = req.query;
+  const data = await fs.readFile(talkerJson);
+  const treatmentData = JSON.parse(data);
+  const filterSearch = treatmentData.filter((t) => t.name.includes(q));
+  return res.status(200).json(filterSearch);
+});
+
 app.get('/talker', async (req, res) => {
   const data = await fs.readFile(talkerJson);
   const treatmentData = JSON.parse(data);
@@ -73,6 +81,28 @@ app.post('/talker',
    return res.status(201).send(newTalker);
 });
 
+app.put('/talker/:id',
+  validToken,
+  validName,
+  validAge,
+  validTalk,
+  validWatchedAt,
+  validRate,
+async (req, res) => {
+  const { id, name, age, talk: { watchedAt, rate } } = req.body;
+  const data = await fs.readFile(talkerJson);
+  const treatmentData = JSON.parse(data);
+  const findIndex = treatmentData.findIndex((t) => t.id === Number(id));
+  const editTalker = { 
+    ...treatmentData[findIndex],
+    name,
+    age, 
+    talk: 
+     { watchedAt, rate },
+  };
+  return res.status(200).send(editTalker);
+});
+
 app.delete('/talker/:id', validToken, async (req, res) => {
   const { id } = req.body;
   const data = await fs.readFile(talkerJson);
@@ -81,14 +111,6 @@ app.delete('/talker/:id', validToken, async (req, res) => {
   treatmentData.pop(findId);
   fs.writeFile(talkerJson, JSON.stringify(treatmentData));
   res.status(204).send(findId);
-});
-
-app.get('/talker/search', validToken, async (req, res) => {
-  const { name } = req.query;
-  const data = await fs.readFile(talkerJson);
-  const treatmentData = JSON.parse(data);
-  const filterSearch = treatmentData.filter((t) => t.name.includes(name));
-  return res.status(200).json(filterSearch);
 });
 
 app.listen(PORT, () => {
