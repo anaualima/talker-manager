@@ -89,18 +89,24 @@ app.put('/talker/:id',
   validWatchedAt,
   validRate,
 async (req, res) => {
-  const { id, name, age, talk: { watchedAt, rate } } = req.body;
+  const { id } = req.params;
+  const number = Number(id);
+  console.log(number);
+  const { name, age, talk: { watchedAt, rate } } = req.body;
   const data = await fs.readFile(talkerJson);
   const treatmentData = JSON.parse(data);
   const findIndex = treatmentData.findIndex((t) => t.id === Number(id));
-  const editTalker = { 
-    ...treatmentData[findIndex],
+  console.log(id);
+  treatmentData[findIndex] = {
+    id: number,
     name,
     age, 
     talk: 
      { watchedAt, rate },
   };
-  return res.status(200).send(editTalker);
+  console.log();
+    fs.writeFile(talkerJson, JSON.stringify(treatmentData));
+    return res.status(200).json(treatmentData[findIndex]);
 });
 
 app.delete('/talker/:id', validToken, async (req, res) => {
