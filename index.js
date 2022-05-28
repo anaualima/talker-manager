@@ -91,12 +91,10 @@ app.put('/talker/:id',
 async (req, res) => {
   const { id } = req.params;
   const number = Number(id);
-  console.log(number);
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const data = await fs.readFile(talkerJson);
   const treatmentData = JSON.parse(data);
   const findIndex = treatmentData.findIndex((t) => t.id === Number(id));
-  console.log(id);
   treatmentData[findIndex] = {
     id: number,
     name,
